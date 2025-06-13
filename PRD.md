@@ -1,7 +1,7 @@
 # Product Requirements Document
 
 ## Overview
-This project implements a multi-agent system where agents collaborate through a shared knowledge graph generated via `LLMGraphTransformer`. The goal is to enable an architect agent (Arx) and a developer agent (D) to discuss, design, and implement software solutions. Agents will communicate using the Google A2A framework and persist symbolic knowledge to Neo4J.
+This project implements a multi-agent system where agents collaborate through a shared knowledge graph generated via `LLMGraphTransformer` from the `langchain-community` package. The goal is to enable an architect agent (Arx) and a developer agent (D) to discuss, design, and implement software solutions. Agents will communicate using the Google A2A framework and persist symbolic knowledge to Neo4J.
 
 ## Objectives
 - Support Python **3.12**.
@@ -11,7 +11,7 @@ This project implements a multi-agent system where agents collaborate through a 
 - Enforce clean code with linting, formatting, and pre-commit hooks.
 - Unit tests covering core components.
 - Clean architecture with an abstract command pattern for the primary use case (executing commands); other use cases may follow standard implementations.
-- Integrate `LLMGraphTransformer` for generating knowledge graphs shared through Neo4J.
+- Integrate `LLMGraphTransformer` (from the `langchain-community` package) for generating knowledge graphs shared through Neo4J.
 
 ## Functional Requirements
 1. **Agent Roles**
@@ -24,7 +24,7 @@ This project implements a multi-agent system where agents collaborate through a 
    - Commands follow an abstract command pattern allowing extensibility.
    - A CLI will expose command execution and agent interactions.
 4. **Knowledge Sharing**
-   - `LLMGraphTransformer` converts dialogues and artifacts into a graph format.
+  - `LLMGraphTransformer` (available in `langchain-community`) converts dialogues and artifacts into a graph format.
    - Each agent may read/write to specific subgraphs.
 5. **Testing and Quality**
    - Pre-commit configured with lint (e.g. `ruff` or `flake8`) and formatting (e.g. `black`).
