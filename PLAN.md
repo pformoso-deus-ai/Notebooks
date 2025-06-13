@@ -9,13 +9,13 @@ This plan outlines the tasks required to build the multi-agent system described 
 - Create initial folder structure following clean architecture (domain, application, infrastructure, interfaces).
 
 ## 2. Core Libraries
-- Add `LLMGraphTransformer` dependency.
+- Add `langchain-community` dependency providing the `LLMGraphTransformer` module.
 - Add SDK module exposing programmatic interfaces for agent operations.
 - Implement CLI entry points for common tasks (e.g. `execute-command`).
 
 ## 3. Knowledge Graph
 - Set up Neo4J connection utilities.
-- Implement graph transformation using `LLMGraphTransformer`.
+- Implement graph transformation using `LLMGraphTransformer` from `langchain-community`.
 - Provide repository layer for persisting and retrieving nodes/relationships.
 
 ## 4. Agent Implementation
