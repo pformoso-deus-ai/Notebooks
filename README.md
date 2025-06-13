@@ -26,6 +26,10 @@ make format
 make test
 ```
 
+## Continuous Integration
+
+All contributions are validated by a GitHub Actions workflow that executes `make lint`, `make format --check` and `make test` on every pull request.
+
 The project follows a clean architecture layout under the `domain`, `application`, `interfaces`, and `infrastructure` packages.
 
 ## CLI Usage
