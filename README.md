@@ -35,3 +35,14 @@ Run the command-line interface with Python's `-m` option:
 ```bash
 python -m multi_agent_system execute-command hello
 ```
+
+## Running with Docker
+
+You can build and run an agent container using the `make run` target. Pass the
+desired agent role via the `ROLE` variable (`arx` for the architect agent or
+`d` for the developer agent). For example:
+
+```bash
+make run ROLE=arx  # build and start the architect container
+make run ROLE=d    # build and start the developer container
+```

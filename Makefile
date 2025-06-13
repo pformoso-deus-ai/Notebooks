@@ -1,19 +1,24 @@
 .PHONY: install lint format test precommit build
 
 install:
-uv pip install -e .[develop]
+	uv pip install -e .[develop]
 
 lint:
-ruff .
+	ruff .
 
 format:
-black .
+	black .
 
 precommit:
-pre-commit run --all-files
+	pre-commit run --all-files
 
 test:
-pytest
+	pytest
 
 build:
-echo "Build placeholder"
+	echo "Build placeholder"
+
+run:
+	@ROLE=$${ROLE:-arx}; \
+	docker build -f Dockerfile.$${ROLE} -t multi-agent-system-$${ROLE} . && \
+	docker run --rm multi-agent-system-$${ROLE}
