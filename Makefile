@@ -1,7 +1,7 @@
 .PHONY: install lint format test precommit build
 
 install:
-	uv pip install -e .[develop]
+	uv pip install --system -e .[develop]
 
 lint:
 	ruff .
