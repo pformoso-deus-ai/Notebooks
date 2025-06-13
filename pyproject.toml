@@ -3,9 +3,9 @@ name = "multi_agent_system"
 version = "0.1.0"
 description = "Multi-agent system powered by LLMGraphTransformer"
 requires-python = ">=3.12"
-
-[project.dependencies]
-llm-graph-transformer = "*"
+dependencies = [
+    "llm-graph-transformer",
+]
 
 [project.optional-dependencies]
 develop = [
