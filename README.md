@@ -17,3 +17,11 @@ make test
 ```
 
 The project follows a clean architecture layout under the `domain`, `application`, `interfaces`, and `infrastructure` packages.
+
+## CLI Usage
+
+Run the command-line interface with Python's `-m` option:
+
+```bash
+python -m multi_agent_system execute-command hello
+```

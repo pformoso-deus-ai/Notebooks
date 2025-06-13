@@ -11,6 +11,9 @@ develop = [
     "pre-commit",
     "pytest",
 ]
+[project.scripts]
+multi-agent-system = "multi_agent_system.__main__:main"
+
 
 [tool.black]
 target-version = ["py312"]
