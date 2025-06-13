@@ -50,3 +50,8 @@ desired agent role via the `ROLE` variable (`arx` for the architect agent or
 make run ROLE=arx  # build and start the architect container
 make run ROLE=d    # build and start the developer container
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
