@@ -2,6 +2,8 @@
 
 This repository contains exploratory notebooks and planning documents for a multi-agent system powered by `LLMGraphTransformer`.
 
+The core functionality relies on the `llm-graph-transformer` package, which will be installed automatically when running `make install`.
+
 - [PRD.md](PRD.md) describes the product requirements for building the agents.
 - [PLAN.md](PLAN.md) outlines the development tasks and architecture approach.
 
