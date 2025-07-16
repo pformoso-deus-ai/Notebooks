@@ -78,7 +78,7 @@ def read_file(path: str):
     typer.echo(result)
 
 
-@app.command("shell")
+@app.command("execute-shell")
 def execute_shell(command: str):
     """Executes a shell command."""
     result = asyncio.run(COMMAND_BUS.execute(ExecuteShellCommand(command=command)))

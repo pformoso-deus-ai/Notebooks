@@ -1,5 +1,5 @@
+import asyncio
 from dataclasses import dataclass
-import subprocess
 from .base import Command, CommandHandler
 
 
@@ -32,19 +32,17 @@ class ExecuteShellCommandHandler(CommandHandler[ExecuteShellCommand]):
         Returns:
             A ShellCommandResult containing the execution details.
         """
-        print(f"Executing shell command: '{command.command}'")
-
-        process = subprocess.run(
+        process = await asyncio.create_subprocess_shell(
             command.command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            check=False,  # Do not raise exception on non-zero exit codes
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
 
-        result = ShellCommandResult(
-            return_code=process.returncode, stdout=process.stdout, stderr=process.stderr
+        stdout, stderr = await process.communicate()
+
+        return ShellCommandResult(
+            return_code=process.returncode,
+            stdout=stdout.decode().strip(),
+            stderr=stderr.decode().strip(),
         )
 
-        print(f"Shell command finished with return code: {result.return_code}")
-        return result

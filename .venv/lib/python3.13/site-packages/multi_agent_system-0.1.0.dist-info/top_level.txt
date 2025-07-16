@@ -1,0 +1,5 @@
+application
+domain
+infrastructure
+interfaces
+multi_agent_system
