@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from domain.communication import CommunicationChannel, Message
-from application.commands.base import CommandBus
+from src.domain.command_bus import CommandBus
 
 
 class Agent(ABC):
@@ -10,7 +10,8 @@ class Agent(ABC):
     Abstract base class for all agents in the system.
 
     Each agent has a unique ID, a command bus to execute actions,
-    and a communication channel to interact with other agents.
+    a communication channel to interact with other agents, and a
+    graph repository to interact with the knowledge graph.
     """
 
     def __init__(

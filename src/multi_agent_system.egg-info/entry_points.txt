@@ -1,2 +1,2 @@
 [console_scripts]
-multi-agent-system = multi_agent_system.__main__:main
+multi_agent_system = interfaces.cli:main

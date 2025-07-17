@@ -1,16 +1,15 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 from application.agent_runner import AgentRunner
-from application.commands.base import Command, CommandHandler
+from application.commands.base import CommandHandler
+from src.domain.commands import Command
 
 
-@dataclass(frozen=True)
-class RunAgentCommand(Command):
+class RunAgentCommand(Command, BaseModel):
     role: str
 
 
-@dataclass(frozen=True)
-class StartProjectCommand(Command):
+class StartProjectCommand(Command, BaseModel):
     project_goal: str
 
 

@@ -1,10 +1,10 @@
 import asyncio
-from dataclasses import dataclass
-from .base import Command, CommandHandler
+from pydantic import BaseModel
+from .base import CommandHandler
+from src.domain.commands import Command
 
 
-@dataclass
-class ShellCommandResult:
+class ShellCommandResult(BaseModel):
     """The result of a shell command execution."""
 
     return_code: int
@@ -12,8 +12,7 @@ class ShellCommandResult:
     stderr: str
 
 
-@dataclass
-class ExecuteShellCommand(Command):
+class ExecuteShellCommand(Command, BaseModel):
     """A command to execute a shell command."""
 
     command: str
@@ -41,7 +40,7 @@ class ExecuteShellCommandHandler(CommandHandler[ExecuteShellCommand]):
         stdout, stderr = await process.communicate()
 
         return ShellCommandResult(
-            return_code=process.returncode,
+            return_code=process.returncode if process.returncode is not None else -1,
             stdout=stdout.decode().strip(),
             stderr=stderr.decode().strip(),
         )

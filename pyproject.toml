@@ -1,39 +1,26 @@
 [project]
-name = "multi-agent-system"
-version = "0.1.0"
+name = "multi_agent_system"
+version = "0.0.1"
 description = "A multi-agent system for software development."
 requires-python = ">=3.11"
 authors = [
     {name = "Pablo Formoso"}
 ]
 dependencies = [
-    # LangChain core dependencies
-    "langchain>=0.2.0",
-    "langchain-core>=0.3.65",
-    "langchain-community>=0.3.25",
-    "langchain-experimental>=0.3.0",
-    "langchain-openai>=0.1.0",
-    "langchain-neo4j>=0.1.0",
-    # Graph dependencies
-    "neo4j>=5.14.0",
-    "networkx>=3.2.0",
-    # LLM dependencies
-    "openai>=1.0.0",
-    # Data processing
-    "pydantic>=2.5.0",
-    "python-dotenv>=1.0.0",
-    "numpy>=1.24.0",
-    "pandas>=2.0.0",
-    "matplotlib>=3.7.0",
-    "scikit-learn>=1.3.0",
-    # Async support
-    "aiohttp>=3.9.0",
-    "asyncio>=3.4.3",
-    "a2a-sdk>=0.2.5",
-    # CLI
-    "typer>=0.12.0",
-    # Environment management
-    "python-dotenv>=1.0.0"
+    "neo4j",
+    "fastapi",
+    "uvicorn",
+    "httpx",
+    "pytest-httpx",
+    "python-dotenv",
+    "langchain",
+    "langchain-core",
+    "langchain-community",
+    "langchain-neo4j",
+    "openai",
+    "langchain-experimental",
+    "langchain-openai",
+    "graphiti-core[openai]",
 ]
 
 [project.optional-dependencies]
@@ -45,13 +32,14 @@ develop = [
     "pytest-asyncio>=0.23.0",
     "pytest-cov>=4.0.0",
     "pytest-mock>=3.12.0",
+    "pytest-httpx>=0.28.0",
     "uv>=0.1.0",
     "ipykernel>=6.0.0",
     "jupyter>=1.0.0"
 ]
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -65,7 +53,7 @@ packages = [
 ]
 
 [project.scripts]
-multi-agent-system = "multi_agent_system.__main__:main"
+multi_agent_system = "interfaces.cli:main"
 
 
 [tool.black]

@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Generic, TypeVar
 
-T = TypeVar("T", bound="Command")
+from src.domain.command_bus import CommandBus as AbstractCommandBus
+from src.domain.commands import Command
 
-
-class Command:
-    """A base class for commands, acting as a data carrier."""
-
-    pass
+T = TypeVar("T", bound=Command)
 
 
 class CommandHandler(ABC, Generic[T]):
@@ -27,17 +24,21 @@ class CommandHandler(ABC, Generic[T]):
         pass
 
 
-class CommandBus:
+class CommandBus(AbstractCommandBus):
     """A simple command bus to dispatch commands to their handlers."""
 
     def __init__(self):
         self._handlers: Dict[type, CommandHandler] = {}
 
+    @property
+    def handlers(self) -> Dict[type, CommandHandler]:
+        return self._handlers
+
     def register(self, command_type: type, handler: CommandHandler):
         """Registers a handler for a specific command type."""
         self._handlers[command_type] = handler
 
-    async def execute(self, command: Command) -> Any:
+    async def dispatch(self, command: Command) -> Any:
         """Executes a command by dispatching it to the registered handler."""
         handler = self._handlers.get(type(command))
         if not handler:

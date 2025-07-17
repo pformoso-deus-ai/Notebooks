@@ -1,10 +1,10 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 from pathlib import Path
-from .base import Command, CommandHandler
+from .base import CommandHandler
+from src.domain.commands import Command
 
 
-@dataclass
-class CreateFileCommand(Command):
+class CreateFileCommand(Command, BaseModel):
     """A command to create a file with specified content."""
 
     path: str
@@ -26,8 +26,7 @@ class CreateFileCommandHandler(CommandHandler[CreateFileCommand]):
             return f"Error creating file: {e}"
 
 
-@dataclass
-class ReadFileCommand(Command):
+class ReadFileCommand(Command, BaseModel):
     """A command to read the content of a file."""
 
     path: str

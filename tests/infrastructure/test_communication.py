@@ -1,52 +1,47 @@
 import pytest
 from domain.communication import Message
-from infrastructure.communication import InMemoryCommunicationChannel
+from infrastructure.communication.memory_channel import InMemoryCommunicationChannel
 
-pytestmark = pytest.mark.asyncio
-
-
-@pytest.fixture
-def channel() -> InMemoryCommunicationChannel:
-    """Provides an instance of the in-memory communication channel."""
-    return InMemoryCommunicationChannel()
-
-
-async def test_send_and_receive_message(channel: InMemoryCommunicationChannel):
-    """Test that a sent message can be received by the correct agent."""
+@pytest.mark.asyncio
+async def test_in_memory_communication_channel():
     # Arrange
-    sender_id = "agent1"
-    receiver_id = "agent2"
-    content = {"task": "test"}
-    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content)
+    channel = InMemoryCommunicationChannel()
+    agent1_id = "agent1"
+    agent2_id = "agent2"
+    message_to_agent1 = Message(
+        sender_id=agent2_id,
+        receiver_id=agent1_id,
+        content="Hello Agent 1",
+    )
+    message_to_agent2 = Message(
+        sender_id=agent1_id,
+        receiver_id=agent2_id,
+        content="Hi Agent 2",
+    )
 
     # Act
-    await channel.send(message)
-    received_message = await channel.receive(receiver_id)
+    await channel.send(message_to_agent1)
+    await channel.send(message_to_agent2)
 
     # Assert
-    assert received_message is not None
-    assert received_message.id == message.id
-    assert received_message.sender_id == sender_id
-    assert received_message.receiver_id == receiver_id
-    assert received_message.content == content
+    # Agent 1 receives their message
+    received_msg1 = await channel.receive(agent1_id)
+    assert received_msg1 is not None
+    assert received_msg1.content == "Hello Agent 1"
+    assert await channel.receive(agent1_id) is None  # No more messages
+
+    # Agent 2 receives their message
+    received_msg2 = await channel.receive(agent2_id)
+    assert received_msg2 is not None
+    assert received_msg2.content == "Hi Agent 2"
+    assert await channel.receive(agent2_id) is None  # No more messages
 
 
-async def test_receive_no_message(channel: InMemoryCommunicationChannel):
-    """Test that receiving from an empty mailbox returns None."""
+@pytest.mark.asyncio
+async def test_get_all_messages():
     # Arrange
-    agent_id = "agent3"
-
-    # Act
-    received_message = await channel.receive(agent_id)
-
-    # Assert
-    assert received_message is None
-
-
-async def test_get_all_messages(channel: InMemoryCommunicationChannel):
-    """Test retrieving all messages for an agent."""
-    # Arrange
-    agent_id = "agent4"
+    channel = InMemoryCommunicationChannel()
+    agent_id = "test-agent"
     messages = [
         Message(sender_id="s1", receiver_id=agent_id, content="msg1"),
         Message(sender_id="s2", receiver_id=agent_id, content="msg2"),
@@ -59,5 +54,7 @@ async def test_get_all_messages(channel: InMemoryCommunicationChannel):
 
     # Assert
     assert len(retrieved_messages) == 2
-    # Check that mailbox is now empty
+    assert retrieved_messages[0].content == "msg1"
+    assert retrieved_messages[1].content == "msg2"
+    # Ensure the mailbox is now empty
     assert await channel.receive(agent_id) is None

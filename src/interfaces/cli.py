@@ -6,7 +6,11 @@ import asyncio
 import os
 import typer
 from dotenv import load_dotenv
-from composition_root import bootstrap_command_bus, AGENT_REGISTRY
+from composition_root import (
+    bootstrap_command_bus,
+    bootstrap_graphiti,
+    AGENT_REGISTRY,
+)
 from application.commands.agent_commands import (
     RunAgentCommand,
     RunAgentHandler,
@@ -17,9 +21,7 @@ from application.commands.file_commands import CreateFileCommand, ReadFileComman
 from application.commands.shell_commands import ExecuteShellCommand
 from application.agent_runner import AgentRunner
 from domain.communication import Message
-from infrastructure.communication import InMemoryCommunicationChannel
-from infrastructure.llm_graph_transformer import LangChainGraphTransformer
-from infrastructure.memory_graph import InMemoryGraphRepository
+from src.infrastructure.communication.memory_channel import InMemoryCommunicationChannel
 
 # --- Environment Loading ---
 load_dotenv()
@@ -30,23 +32,8 @@ COMMAND_BUS = bootstrap_command_bus()
 # For now, we use an in-memory channel. This would be replaced by a real
 # implementation (e.g., Google A2A) in a production scenario.
 COMMUNICATION_CHANNEL = InMemoryCommunicationChannel()
-GRAPH_REPOSITORY = InMemoryGraphRepository()
+GRAPH, LLM = bootstrap_graphiti()
 
-# --- LLMGraphTransformer Initialization ---
-# This requires credentials, so we load them from the environment.
-try:
-    GRAPH_TRANSFORMER = LangChainGraphTransformer(
-        neo4j_url=os.environ["NEO4J_URI"],
-        neo4j_username=os.environ["NEO4J_USERNAME"],
-        neo4j_password=os.environ["NEO4J_PASSWORD"],
-        openai_api_key=os.environ["OPENAI_API_KEY"],
-    )
-except KeyError as e:
-    print(f"Error: Environment variable {e} not set.")
-    print(
-        "Please create a .env file with NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD, and OPENAI_API_KEY."
-    )
-    raise typer.Exit(code=1)
 
 # --- Typer App ---
 app = typer.Typer(
@@ -60,28 +47,28 @@ app = typer.Typer(
 @app.command()
 def echo(text: str):
     """Prints the given text back to the console."""
-    result = asyncio.run(COMMAND_BUS.execute(EchoCommand(text=text)))
+    result = asyncio.run(COMMAND_BUS.dispatch(EchoCommand(text=text)))
     typer.echo(result)
 
 
 @app.command("create-file")
 def create_file(path: str, content: str):
     """Creates a file at the specified path with the given content."""
-    result = asyncio.run(COMMAND_BUS.execute(CreateFileCommand(path=path, content=content)))
+    result = asyncio.run(COMMAND_BUS.dispatch(CreateFileCommand(path=path, content=content)))
     typer.echo(result)
 
 
 @app.command("read-file")
 def read_file(path: str):
     """Reads and prints the content of the specified file."""
-    result = asyncio.run(COMMAND_BUS.execute(ReadFileCommand(path=path)))
+    result = asyncio.run(COMMAND_BUS.dispatch(ReadFileCommand(path=path)))
     typer.echo(result)
 
 
 @app.command("execute-shell")
 def execute_shell(command: str):
     """Executes a shell command."""
-    result = asyncio.run(COMMAND_BUS.execute(ExecuteShellCommand(command=command)))
+    result = asyncio.run(COMMAND_BUS.dispatch(ExecuteShellCommand(command=command)))
     typer.echo(result)
 
 
@@ -92,7 +79,7 @@ def start_project(
     """
     Initiates a new project by sending a task to the Architect agent.
     """
-    arx_agent_id = "arx-agent"
+    arx_agent_id = "data_architect-agent"
 
     async def send_task():
         project_command = StartProjectCommand(project_goal=goal)
@@ -118,23 +105,33 @@ def run_agent(
         raise typer.Exit(code=1)
 
     # --- Dynamic Agent and Handler Creation ---
-    agent_class = AGENT_REGISTRY[role]
+    agent_factory = AGENT_REGISTRY[role]
     agent_id = f"{role}-agent"
 
     # Special handling for agents with extra dependencies
-    if role == "arx":
-        agent = agent_class(
+    if role == "data_architect":
+        agent = agent_factory(
             agent_id=agent_id,
             command_bus=COMMAND_BUS,
             communication_channel=COMMUNICATION_CHANNEL,
-            graph_repository=GRAPH_REPOSITORY,
-            graph_transformer=GRAPH_TRANSFORMER,
+            graph=GRAPH,
+            llm=LLM,
+            url="http://localhost:8001",
+        )
+    elif role == "data_engineer":
+        agent = agent_factory(
+            agent_id=agent_id,
+            command_bus=COMMAND_BUS,
+            communication_channel=COMMUNICATION_CHANNEL,
+            graph=GRAPH,
+            url="http://localhost:8002",
         )
     else:
-        agent = agent_class(
+        agent = agent_factory(
             agent_id=agent_id,
             command_bus=COMMAND_BUS,
             communication_channel=COMMUNICATION_CHANNEL,
+            url="http://localhost:8000",
         )
 
     runner = AgentRunner(agent)
@@ -145,7 +142,7 @@ def run_agent(
 
     typer.echo(f"Starting agent with role: {role} (Press Ctrl+C to stop)")
     try:
-        asyncio.run(COMMAND_BUS.execute(RunAgentCommand(role=role)))
+        asyncio.run(COMMAND_BUS.dispatch(RunAgentCommand(role=role)))
     except KeyboardInterrupt:
         typer.echo(f"\nStopping agent {role}...")
         runner.stop()

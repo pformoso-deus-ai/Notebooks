@@ -19,7 +19,7 @@ async def test_command_bus_executes_handler(command_bus: CommandBus):
     command = EchoCommand(text="Hello, World!")
 
     # Act
-    result = await command_bus.execute(command)
+    result = await command_bus.dispatch(command)
 
     # Assert
     assert result == "Hello, World!"
@@ -38,4 +38,4 @@ async def test_unregistered_command_raises_error(command_bus: CommandBus):
     with pytest.raises(
         TypeError, match="No handler registered for command type UnregisteredCommand"
     ):
-        await command_bus.execute(command)
+        await command_bus.dispatch(command)

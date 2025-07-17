@@ -10,4 +10,4 @@ tests/__pycache__/
 # Environment variables
 .env
 
-# ... (rest of the file is the same) 
+# ... (rest of the file is the same) .env

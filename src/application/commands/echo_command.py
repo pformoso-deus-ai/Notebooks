@@ -1,9 +1,9 @@
-from dataclasses import dataclass
-from .base import Command, CommandHandler
+from pydantic import BaseModel
+from .base import CommandHandler
+from src.domain.commands import Command
 
 
-@dataclass
-class EchoCommand(Command):
+class EchoCommand(Command, BaseModel):
     """A simple command that echoes back the text it receives."""
 
     text: str
