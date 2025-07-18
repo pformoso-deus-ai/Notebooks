@@ -1,10 +1,10 @@
-from graphiti.graph import Graph
-from graphiti.llm import LLM
+from graphiti_core import Graphiti
 
-def get_graph(config: dict) -> Graph:
-    """Initializes the Graphiti graph from a config."""
-    return Graph(config)
-
-def get_llm(config: dict) -> LLM:
-    """Initializes the Graphiti LLM from a config."""
-    return LLM(config) 
+def get_graphiti(config: dict) -> Graphiti:
+    """Initializes the Graphiti instance from a config."""
+    return Graphiti(
+        uri=config.get("uri"),
+        user=config.get("user"),
+        password=config.get("password"),
+        # Add more config as needed (llm_client, embedder, etc.)
+    ) 

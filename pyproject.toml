@@ -21,6 +21,8 @@ dependencies = [
     "langchain-experimental",
     "langchain-openai",
     "graphiti-core[openai]",
+    "pytest-cov>=6.2.1",
+    "pytest-asyncio>=1.1.0",
 ]
 
 [project.optional-dependencies]

@@ -1,7 +1,6 @@
 from domain.agent import Agent
 from application.commands.agent_commands import StartProjectCommand
-from graphiti.graph import Graph
-from graphiti.llm import LLM
+from graphiti_core import Graphiti
 from langchain_core.documents import Document
 from typing import Optional
 from domain.communication import CommunicationChannel
@@ -19,8 +18,8 @@ class DataArchitectAgent(Agent):
         agent_id: str,
         command_bus: CommandBus,
         communication_channel: CommunicationChannel,
-        graph: Graph,
-        llm: LLM,
+        graph: Graphiti,
+        llm: Graphiti,
         url: str,
     ):
         super().__init__(

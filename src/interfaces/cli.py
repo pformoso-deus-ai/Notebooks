@@ -32,7 +32,6 @@ COMMAND_BUS = bootstrap_command_bus()
 # For now, we use an in-memory channel. This would be replaced by a real
 # implementation (e.g., Google A2A) in a production scenario.
 COMMUNICATION_CHANNEL = InMemoryCommunicationChannel()
-GRAPH, LLM = bootstrap_graphiti()
 
 
 # --- Typer App ---
@@ -108,14 +107,17 @@ def run_agent(
     agent_factory = AGENT_REGISTRY[role]
     agent_id = f"{role}-agent"
 
+    # Use agent_id as the namespace for Graphiti graph
+    graph = bootstrap_graphiti(agent_id)
+
     # Special handling for agents with extra dependencies
     if role == "data_architect":
         agent = agent_factory(
             agent_id=agent_id,
             command_bus=COMMAND_BUS,
             communication_channel=COMMUNICATION_CHANNEL,
-            graph=GRAPH,
-            llm=LLM,
+            graph=graph,
+            llm=graph,  # Use Graphiti for both graph and LLM
             url="http://localhost:8001",
         )
     elif role == "data_engineer":
@@ -123,7 +125,7 @@ def run_agent(
             agent_id=agent_id,
             command_bus=COMMAND_BUS,
             communication_channel=COMMUNICATION_CHANNEL,
-            graph=GRAPH,
+            graph=graph,
             url="http://localhost:8002",
         )
     else:
