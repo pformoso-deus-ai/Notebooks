@@ -1,23 +1,28 @@
 # Development Plan: Neurosymbolic Knowledge Management
 
 ## Phase 1: Architecture & Design
-- [ ] Finalize requirements and PRD
-- [ ] Design layered knowledge architecture (perception, semantic, reasoning, application)
-- [ ] Choose between dedicated agent, integrated, or hybrid approach (or make configurable)
-- [ ] Define event-driven/API-based update mechanism
+- [x] Finalize requirements and PRD (reflecting MarkItDown, Graphiti/FalkorDB, hybrid management, etc.)
+- [ ] Design layered knowledge architecture (perception, semantic, reasoning, application; dynamic ontology)
+- [ ] Choose between dedicated agent, integrated, or hybrid approach (default: hybrid, configurable)
+- [ ] Define event-driven/API-based update mechanism (FastAPI, RabbitMQ; Flink for future)
+- [ ] Plan for MCP integration and model backend replacement (OpenAI, Ollama)
 
 ## Phase 2: Core Implementation
-- [ ] Implement knowledge management agent/service (if chosen)
-- [ ] Integrate KG update logic into agents (if chosen)
-- [ ] Implement event bus or API for KG operations
-- [ ] Implement layered knowledge organization in codebase
+- [ ] Implement MarkItDown wrapper for document conversion
+- [ ] Implement knowledge management agent/service (for escalated/complex ops)
+- [ ] Integrate KG update logic into agents (for simple ops)
+- [ ] Implement event bus (RabbitMQ) and API (FastAPI) for KG operations
+- [ ] Implement layered knowledge organization in codebase (dynamic ontology)
+- [ ] Add support for Graphiti and FalkorDB as KG backends (configurable)
+- [ ] Integrate MCP for side service communication
 
 ## Phase 3: Advanced Features
-- [ ] Add audit trail, rollback, and error recovery for KG updates
-- [ ] Implement batch and concurrent processing
-- [ ] Add monitoring and metrics for KG management
+- [ ] Add audit trail, rollback, and error recovery for KG updates (future phase)
+- [ ] Implement batch and concurrent processing (with queueing)
+- [ ] Add monitoring and metrics for KG management (OpenLLMetry)
+- [ ] Add basic RBAC for access control (four roles)
 
 ## Phase 4: Testing & Documentation
 - [ ] End-to-end and integration tests for all workflows
 - [ ] Performance and scalability benchmarks
-- [ ] Complete user and technical documentation 
+- [ ] Complete user and technical documentation (Markdown, docs/specs folder) 
