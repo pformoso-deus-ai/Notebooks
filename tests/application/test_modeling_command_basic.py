@@ -190,10 +190,10 @@ class TestModelingWorkflowBasic:
         result = await workflow.execute(command)
         
         # Verify results
-        assert result.success is True
-        assert result.graph_document is not None
-        assert result.artifacts is not None
-        assert len(result.warnings) == 0
+        assert result["success"] is True
+        assert result["graph_document"] is not None
+        assert result["artifacts"] is not None
+        assert len(result["warnings"]) == 0
         
         # Verify mocks were called
         mock_parser_factory.get_parser.assert_called_once_with("examples/sample_dda.md")
@@ -222,8 +222,8 @@ class TestModelingWorkflowBasic:
         result = await workflow.execute(command)
         
         # Verify results
-        assert result.success is False
-        assert "Domain is required" in result.errors
+        assert result["success"] is False
+        assert "Domain is required" in result["errors"]
     
     @pytest.mark.asyncio
     async def test_workflow_with_parser_exception(self, workflow, mock_parser_factory):
@@ -243,5 +243,5 @@ class TestModelingWorkflowBasic:
         result = await workflow.execute(command)
         
         # Verify results
-        assert result.success is False
-        assert "Parser error" in result.errors[0] 
+        assert result["success"] is False
+        assert "Parser error" in result["errors"][0] 

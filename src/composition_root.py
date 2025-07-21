@@ -18,12 +18,16 @@ from application.commands.shell_commands import (
     ExecuteShellCommand,
     ExecuteShellCommandHandler,
 )
+from application.commands.modeling_command import ModelingCommand
+from application.commands.modeling_handler import ModelingCommandHandler
+from application.agents.data_architect.modeling_workflow import ModelingWorkflow
+from application.agents.data_architect.dda_parser import DDAParserFactory
+from application.agents.data_architect.domain_modeler import DomainModeler
+from infrastructure.parsers.markdown_parser import MarkdownDDAParser
 from domain.agent import Agent
 from domain.communication import CommunicationChannel
 from infrastructure.graphiti import get_graphiti
 from graphiti_core import Graphiti
-from graphiti.graph import Graph
-from graphiti.llm import LLM
 
 
 # --- Agent Factory Functions ---
@@ -75,6 +79,21 @@ def create_data_engineer_agent(
         url=url,
     )
 
+def create_modeling_command_handler(graph: Graphiti) -> ModelingCommandHandler:
+    """Creates a ModelingCommandHandler with all necessary dependencies."""
+    # Create parser factory and register parsers
+    parser_factory = DDAParserFactory()
+    markdown_parser = MarkdownDDAParser()
+    parser_factory.register_parser(markdown_parser)
+    
+    # Create domain modeler
+    domain_modeler = DomainModeler(graph, graph)  # Use Graphiti for both graph and LLM
+    
+    # Create modeling workflow
+    modeling_workflow = ModelingWorkflow(parser_factory, domain_modeler)
+    
+    return ModelingCommandHandler(modeling_workflow)
+
 
 # Agent Registry
 # Maps a role name to an agent factory function.
@@ -85,7 +104,7 @@ AGENT_REGISTRY: Dict[str, Callable[..., Agent]] = {
 }
 
 
-def bootstrap_graphiti(agent_name: str = None) -> Graphiti:
+async def bootstrap_graphiti(agent_name: str | None = None) -> Graphiti:
     """Initializes the Graphiti instance from environment variables, namespaced by agent if agent_name is provided."""
     from dotenv import load_dotenv
     import os
@@ -94,12 +113,12 @@ def bootstrap_graphiti(agent_name: str = None) -> Graphiti:
 
     graph_config = {
         "uri": os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-        "user": os.environ.get("NEO4J_USER", "neo4j"),
+        "user": os.environ.get("NEO4J_USERNAME", os.environ.get("NEO4J_USER", "neo4j")),
         "password": os.environ.get("NEO4J_PASSWORD", "password"),
     }
     if agent_name:
         graph_config["name"] = agent_name
-    return get_graphiti(graph_config)
+    return await get_graphiti(graph_config)
 
 
 def bootstrap_command_bus() -> CommandBus:
@@ -114,7 +133,9 @@ def bootstrap_command_bus() -> CommandBus:
         ExecuteShellCommand,
         ExecuteShellCommandHandler(),
     )
-    command_bus.register(BuildKGCommand, BuildKGCommandHandler())
+    # Note: BuildKGCommand and ModelingCommand handlers require Graphiti instances
+    # and are registered dynamically when needed in the CLI or agent creation
+    
     # Note: RunAgentHandler is registered dynamically in the CLI
     # because it depends on a runtime agent instance.
 

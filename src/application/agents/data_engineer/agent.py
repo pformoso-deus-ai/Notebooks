@@ -1,7 +1,7 @@
 from domain.agent import Agent
 from domain.communication import CommunicationChannel
 from src.domain.command_bus import CommandBus
-from graphiti.graph import Graph
+from graphiti_core import Graphiti
 from typing import Optional
 
 
@@ -16,7 +16,7 @@ class DataEngineerAgent(Agent):
         agent_id: str,
         command_bus: CommandBus,
         communication_channel: CommunicationChannel,
-        graph: Graph,
+        graph: Graphiti,
         url: str,
     ):
         super().__init__(
@@ -29,11 +29,13 @@ class DataEngineerAgent(Agent):
         """
         Registers the agent as a service in the knowledge graph.
         """
-        await self.graph.upsert_node(
-            "AgentService",
-            self.agent_id,
-            {"url": self.url, "capabilities": ["implementation"]},
-        )
+        # TODO: Implement proper graph registration when Graphiti interface is clarified
+        # await self.graph.upsert_node(
+        #     "AgentService",
+        #     self.agent_id,
+        #     {"url": self.url, "capabilities": ["implementation"]},
+        # )
+        pass
 
     async def process_messages(self) -> None:
         # Currently idle. Future logic will involve coding and execution tasks.

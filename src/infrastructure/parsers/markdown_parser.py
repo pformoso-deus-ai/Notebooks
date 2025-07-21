@@ -103,7 +103,7 @@ class MarkdownDDAParser(DDAParser):
         entities = []
         
         # Find the Data Entities section
-        pattern = r'## Data Entities\s*\n(.*?)(?=\n##|\Z)'
+        pattern = r'## Data Entities\s*\n(.*?)(?=\n## Relationships|\Z)'
         match = re.search(pattern, content, re.DOTALL)
         if not match:
             return entities
@@ -111,9 +111,14 @@ class MarkdownDDAParser(DDAParser):
         entities_section = match.group(1)
         
         # Split by entity headers (### Entity Name)
+        # First, remove the leading ### from the first entity
+        if entities_section.startswith('### '):
+            entities_section = entities_section[4:]  # Remove "### "
+        
+        # Split by entity headers
         entity_blocks = re.split(r'\n### ', entities_section)
         
-        for block in entity_blocks[1:]:  # Skip the first empty block
+        for block in entity_blocks:  # Process all blocks
             entity = self._parse_entity_block(block)
             if entity:
                 entities.append(entity)
@@ -202,13 +207,31 @@ class MarkdownDDAParser(DDAParser):
         
         relationships_section = match.group(1)
         
-        # Split by relationship headers
-        relationship_blocks = re.split(r'\n### ', relationships_section)
+        # Look for relationship patterns directly in the entire section
+        relationship_pattern = r'\*\*([^*]+)\*\*\s*→\s*\*\*([^*]+)\*\*\s*\(([^)]+)\)'
+        matches = re.findall(relationship_pattern, relationships_section)
         
-        for block in relationship_blocks[1:]:  # Skip the first empty block
-            relationship = self._parse_relationship_block(block)
-            if relationship:
-                relationships.append(relationship)
+        for source_entity, target_entity, relationship_type in matches:
+            # Find the description for this relationship
+            description = ""
+            lines = relationships_section.split('\n')
+            for i, line in enumerate(lines):
+                if f"**{source_entity}** → **{target_entity}**" in line:
+                    # Look for description in next lines
+                    for j in range(i + 1, min(i + 5, len(lines))):
+                        if lines[j].strip().startswith('- ') and not lines[j].strip().startswith('- **'):
+                            description = lines[j].strip()[2:]  # Remove "- "
+                            break
+                    break
+            
+            relationship = Relationship(
+                source_entity=source_entity.strip(),
+                target_entity=target_entity.strip(),
+                relationship_type=relationship_type.strip(),
+                description=description,
+                constraints=[]
+            )
+            relationships.append(relationship)
         
         return relationships
     

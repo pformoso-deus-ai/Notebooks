@@ -14,6 +14,7 @@ langchain-openai
 graphiti-core[openai]
 pytest-cov>=6.2.1
 pytest-asyncio>=1.1.0
+typer>=0.9.0
 
 [develop]
 ruff>=0.1.0

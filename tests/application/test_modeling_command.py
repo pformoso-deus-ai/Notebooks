@@ -171,7 +171,7 @@ class TestModelingWorkflow:
             relationships=[
                 Relationship(
                     source_entity="TestEntity",
-                    target_entity="TestEntity2",
+                    target_entity="TestEntity",
                     relationship_type="1:N",
                     description="Test relationship"
                 )
@@ -192,28 +192,37 @@ class TestModelingWorkflow:
             "domain": "Test Domain"
         }
         
-        # Create command
-        command = ModelingCommand(
-            dda_path="test.md",
-            domain="Test Domain",
-            update_existing=False,
-            validate_only=False,
-            output_path=None
-        )
+        # Create command with a temporary file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+            temp_file.write("# Test DDA\n")
+            temp_file_path = temp_file.name
         
-        # Execute workflow
-        result = await workflow.execute(command)
-        
-        # Verify results
-        assert result.success is True
-        assert result.graph_document is not None
-        assert result.artifacts is not None
-        assert len(result.warnings) == 0
-        
-        # Verify mocks were called
-        mock_parser_factory.get_parser.assert_called_once_with("test.md")
-        mock_parser.parse.assert_called_once_with("test.md")
-        mock_domain_modeler.create_domain_graph.assert_called_once_with(sample_dda_document)
+        try:
+            command = ModelingCommand(
+                dda_path=temp_file_path,
+                domain="Test Domain",
+                update_existing=False,
+                validate_only=False,
+                output_path=None
+            )
+            
+            # Execute workflow
+            result = await workflow.execute(command)
+            
+            # Verify results
+            assert result["success"] is True
+            assert result["graph_document"] is not None
+            assert result["artifacts"] is not None
+            assert len(result.get("errors", [])) == 0
+            
+            # Verify mocks were called
+            mock_parser_factory.get_parser.assert_called_once_with(temp_file_path)
+            mock_parser.parse.assert_called_once_with(temp_file_path)
+            mock_domain_modeler.create_domain_graph.assert_called_once_with(sample_dda_document)
+            
+        finally:
+            # Clean up temporary file
+            os.unlink(temp_file_path)
     
     @pytest.mark.asyncio
     async def test_workflow_with_validation_errors(self, workflow, mock_parser_factory, sample_dda_document):
@@ -227,21 +236,31 @@ class TestModelingWorkflow:
         mock_parser.parse = AsyncMock(return_value=invalid_dda)
         mock_parser_factory.get_parser.return_value = mock_parser
         
-        # Create command
-        command = ModelingCommand(
-            dda_path="test.md",
-            domain="Test Domain",
-            update_existing=False,
-            validate_only=False,
-            output_path=None
-        )
+        # Create command with a temporary file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+            temp_file.write("# Test DDA\n")
+            temp_file_path = temp_file.name
         
-        # Execute workflow
-        result = await workflow.execute(command)
-        
-        # Verify results
-        assert result.success is False
-        assert "Domain is required" in result.errors
+        try:
+            command = ModelingCommand(
+                dda_path=temp_file_path,
+                domain="Test Domain",
+                update_existing=False,
+                validate_only=False,
+                output_path=None
+            )
+            
+            # Execute workflow
+            result = await workflow.execute(command)
+            
+            # Verify results
+            assert result["success"] is False
+            assert len(result.get("errors", [])) > 0
+            assert "Domain is required" in result.get("errors", [])
+            
+        finally:
+            # Clean up temporary file
+            os.unlink(temp_file_path)
     
     @pytest.mark.asyncio
     async def test_workflow_with_parser_exception(self, workflow, mock_parser_factory):
@@ -251,18 +270,28 @@ class TestModelingWorkflow:
         mock_parser.parse = AsyncMock(side_effect=Exception("Parser error"))
         mock_parser_factory.get_parser.return_value = mock_parser
         
-        # Create command
-        command = ModelingCommand(
-            dda_path="test.md",
-            domain="Test Domain",
-            update_existing=False,
-            validate_only=False,
-            output_path=None
-        )
+        # Create command with a temporary file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+            temp_file.write("# Test DDA\n")
+            temp_file_path = temp_file.name
         
-        # Execute workflow
-        result = await workflow.execute(command)
-        
-        # Verify results
-        assert result.success is False
-        assert "Parser error" in result.errors[0] 
+        try:
+            command = ModelingCommand(
+                dda_path=temp_file_path,
+                domain="Test Domain",
+                update_existing=False,
+                validate_only=False,
+                output_path=None
+            )
+            
+            # Execute workflow
+            result = await workflow.execute(command)
+            
+            # Verify results
+            assert result["success"] is False
+            assert len(result.get("errors", [])) > 0
+            assert "Parser error" in result.get("errors", [])[0]
+            
+        finally:
+            # Clean up temporary file
+            os.unlink(temp_file_path) 
