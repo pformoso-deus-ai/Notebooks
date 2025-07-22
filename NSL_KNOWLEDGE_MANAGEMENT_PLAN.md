@@ -2,13 +2,13 @@
 
 ## Phase 1: Architecture & Design
 - [x] Finalize requirements and PRD (reflecting MarkItDown, Graphiti/FalkorDB, hybrid management, etc.)
-- [ ] Design layered knowledge architecture (perception, semantic, reasoning, application; dynamic ontology)
-- [ ] Choose between dedicated agent, integrated, or hybrid approach (default: hybrid, configurable)
-- [ ] Define event-driven/API-based update mechanism (FastAPI, RabbitMQ; Flink for future)
-- [ ] Plan for MCP integration and model backend replacement (OpenAI, Ollama)
+- [x] Design layered knowledge architecture (perception, semantic, reasoning, application; dynamic ontology)
+- [x] Choose between dedicated agent, integrated, or hybrid approach (default: hybrid, configurable)
+- [x] Define event-driven/API-based update mechanism (FastAPI, RabbitMQ; Flink for future)
+- [x] Plan for MCP integration and model backend replacement (OpenAI, Ollama)
 
 ## Phase 2: Core Implementation
-- [ ] Implement MarkItDown wrapper for document conversion
+- [x] Implement MarkItDown wrapper for document conversion (with robust integration tests)
 - [ ] Implement knowledge management agent/service (for escalated/complex ops)
 - [ ] Integrate KG update logic into agents (for simple ops)
 - [ ] Implement event bus (RabbitMQ) and API (FastAPI) for KG operations

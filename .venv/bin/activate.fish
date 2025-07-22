@@ -91,8 +91,8 @@ set -gx PATH "$VIRTUAL_ENV"'/bin' $PATH
 
 # Prompt override provided?
 # If not, just use the environment name.
-if test -n 'multi-agent-system'
-    set -gx VIRTUAL_ENV_PROMPT 'multi-agent-system'
+if test -n ''
+    set -gx VIRTUAL_ENV_PROMPT ''
 else
     set -gx VIRTUAL_ENV_PROMPT (basename "$VIRTUAL_ENV")
 end
