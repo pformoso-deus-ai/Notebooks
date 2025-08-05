@@ -5,6 +5,7 @@ from application.agents.data_architect.agent import DataArchitectAgent
 from application.agents.data_engineer.agent import DataEngineerAgent
 from application.agents.data_engineer.handlers.build_kg import BuildKGCommandHandler
 from application.agents.echo_agent import EchoAgent
+from application.agents.knowledge_manager.agent import KnowledgeManagerAgent
 from application.commands.base import CommandBus
 from src.application.commands.collaboration_commands import BuildKGCommand
 from application.commands.echo_command import EchoCommand, EchoCommandHandler
@@ -79,6 +80,19 @@ def create_data_engineer_agent(
         url=url,
     )
 
+def create_knowledge_manager_agent(
+    agent_id: str,
+    command_bus: CommandBus,
+    communication_channel: CommunicationChannel,
+    graph: Graphiti,
+    url: str,
+) -> KnowledgeManagerAgent:
+    """Creates a KnowledgeManagerAgent for handling escalated KG operations."""
+    return KnowledgeManagerAgent(
+        graph=graph,
+        llm=graph,  # Use Graphiti for both graph and LLM
+    )
+
 def create_modeling_command_handler(graph: Graphiti) -> ModelingCommandHandler:
     """Creates a ModelingCommandHandler with all necessary dependencies."""
     # Create parser factory and register parsers
@@ -101,6 +115,7 @@ AGENT_REGISTRY: Dict[str, Callable[..., Agent]] = {
     "data_architect": create_data_architect_agent,
     "data_engineer": create_data_engineer_agent,
     "echo": create_echo_agent,
+    "knowledge_manager": create_knowledge_manager_agent,
 }
 
 
