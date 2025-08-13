@@ -1,80 +1,92 @@
 [project]
-name = "multi_agent_system"
-version = "0.0.1"
-description = "A multi-agent system for software development."
-requires-python = ">=3.11"
-authors = [
-    {name = "Pablo Formoso"}
-]
-dependencies = [
-    "neo4j",
-    "fastapi",
-    "uvicorn",
-    "httpx",
-    "pytest-httpx",
-    "python-dotenv",
-    "langchain",
-    "langchain-core",
-    "langchain-community",
-    "langchain-neo4j",
-    "openai",
-    "langchain-experimental",
-    "langchain-openai",
-    "graphiti-core[openai]",
-    "pytest-cov>=6.2.1",
-    "pytest-asyncio>=1.1.0",
-    "typer>=0.9.0",
-]
+    name = "multi_agent_system"
+    version = "0.0.1"
+    description = "A multi-agent system for software development."
+    requires-python = ">=3.11"
+    authors = [
+        {name = "Pablo Formoso"}
+    ]
+    dependencies = [
+        "neo4j",
+        "fastapi",
+        "uvicorn",
+        "httpx",
+        "pytest-httpx",
+        "python-dotenv",
+        "langchain",
+        "langchain-core",
+        "langchain-community",
+        "langchain-neo4j",
+        "openai",
+        "langchain-experimental",
+        "langchain-openai",
+        "graphiti-core[openai]",
+        "pytest-cov>=6.2.1",
+        "pytest-asyncio>=1.1.0",
+        "typer>=0.9.0",
+        "pytest>=7.0.0",
+        "pytest-asyncio>=0.23.0",
+        "pytest-cov>=4.0.0",
+        "pytest-mock>=3.12.0",
+        "pytest-httpx>=0.28.0",
+        "uv>=0.1.0",
+        "ipykernel>=6.0.0",
+        "jupyter>=1.0.0"
+    ]
 
-[project.optional-dependencies]
-develop = [
-    "ruff>=0.1.0",
-    "black>=23.0.0",
-    "pre-commit>=3.0.0",
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.23.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.12.0",
-    "pytest-httpx>=0.28.0",
-    "uv>=0.1.0",
-    "ipykernel>=6.0.0",
-    "jupyter>=1.0.0"
-]
+    [project.optional-dependencies]
+    develop = [
+        "ruff>=0.1.0",
+        "black>=23.0.0",
+        "pre-commit>=3.0.0",
+        "pytest>=7.0.0",
+        "pytest-asyncio>=0.23.0",
+        "pytest-cov>=4.0.0",
+        "pytest-mock>=3.12.0",
+        "pytest-httpx>=0.28.0",
+        "uv>=0.1.0",
+        "ipykernel>=6.0.0",
+        "jupyter>=1.0.0"
+    ]
 
-[build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+    [build-system]
+    requires = ["setuptools", "setuptools-scm"]
+    build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-packages = [
-    "multi_agent_system",
-    "domain",
-    "interfaces",
-    "application",
-    "infrastructure"
-]
+    [tool.setuptools]
+    package-dir = {"" = "src"}
+    packages = [
+        "multi_agent_system",
+        "domain",
+        "interfaces",
+        "application",
+        "infrastructure"
+    ]
 
-[project.scripts]
-multi_agent_system = "interfaces.cli:main"
+    [project.scripts]
+    multi_agent_system = "interfaces.cli:main"
 
+    [tool.black]
+    target-version = ["py312"]
 
-[tool.black]
-target-version = ["py312"]
+    [tool.ruff]
+    target-version = "py312"
+    line-length = 101
 
-[tool.ruff]
-target-version = "py312"
-line-length = 101
+    # Ignore specific lint rules for problematic test files.
+    [tool.ruff.per-file-ignores]
+    "tests/performance/test_modeling_performance.py" = ["F541", "F841"]
+    "tests/test_neo4j_connection.py" = ["F401"]
 
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --cov=src --cov-report=term-missing"
-markers = [
-    "asyncio: mark test as async",
-    "integration: mark test as integration test",
-    "unit: mark test as unit test"
-]
+    [tool.pytest.ini_options]
+    asyncio_mode = "auto"
+    testpaths = ["tests"]
+    python_files = ["test_*.py"]
+    python_classes = ["Test*"]
+    python_functions = ["test_*"]
+    addopts = "-v --cov=src --cov-report=term-missing"
+    markers = [
+        "asyncio: mark test as async",
+        "integration: mark test as integration test",
+        "unit: mark test as unit test"
+    ]
