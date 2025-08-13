@@ -38,8 +38,8 @@ setenv PATH "$VIRTUAL_ENV:q/bin:$PATH:q"
 
 
 
-if ('multi-agent-system' != "") then
-    setenv VIRTUAL_ENV_PROMPT 'multi-agent-system'
+if ('' != "") then
+    setenv VIRTUAL_ENV_PROMPT ''
 else
     setenv VIRTUAL_ENV_PROMPT "$VIRTUAL_ENV:t:q"
 endif
