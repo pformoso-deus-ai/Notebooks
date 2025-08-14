@@ -37,5 +37,5 @@ class GraphitiBackend(KnowledgeGraphBackend):
     async def rollback(self) -> None:
         raise NotImplementedError("Graphiti backend integration not implemented")
 
-    async def query(self, query: str) -> Any:
+    async def query(self, query: str) -> None:
         raise NotImplementedError("Graphiti backend integration not implemented")

@@ -11,6 +11,7 @@ A powerful, enterprise-grade multi-agent system for automated domain knowledge g
 ### **🤖 Multi-Agent Neural Network**
 - **Data Architect Agent**: Specialized in domain modeling and knowledge graph creation
 - **Data Engineer Agent**: Handles data pipeline construction and knowledge graph building
+- **Knowledge Manager Agent**: Manages complex KG operations, validation, and conflict resolution
 - **Echo Agent**: Provides communication and testing capabilities
 - **Extensible Agent Framework**: Easy to add new specialized agents
 - **Neural Communication**: Seamless agent-to-agent messaging and collaboration
@@ -25,6 +26,8 @@ A powerful, enterprise-grade multi-agent system for automated domain knowledge g
 ### **🔧 Enterprise-Grade Infrastructure**
 - **Clean Architecture**: Domain-driven design with clear separation of concerns
 - **Command Bus Pattern**: Decoupled command handling and execution
+- **Event-Driven Architecture**: RabbitMQ-based distributed event bus
+- **REST API**: FastAPI-based knowledge graph operations API
 - **Async Processing**: High-performance asynchronous operations
 - **Comprehensive Testing**: Unit, integration, and performance test suites
 - **Production Monitoring**: Structured logging and observability
@@ -35,6 +38,7 @@ A powerful, enterprise-grade multi-agent system for automated domain knowledge g
 - Python 3.12+
 - Neo4j Database (for knowledge graph operations)
 - Graphiti Framework (for graph operations)
+- RabbitMQ (for distributed event bus - optional)
 
 ### **Installation**
 
@@ -85,6 +89,54 @@ uv run python -m multi_agent_system create-file data/models/customer.json
 uv run python -m multi_agent_system read-file data/models/customer.json
 ```
 
+#### **4. Knowledge Graph Operations API**
+
+```bash
+# Start the API server
+uv run python -m uvicorn src.interfaces.kg_operations_api:app --host 0.0.0.0 --port 8000
+
+# Create an entity via API
+curl -X POST "http://localhost:8000/entities" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "customer_001",
+    "properties": {"name": "John Doe", "email": "john@example.com"},
+    "labels": ["customer", "premium"]
+  }'
+
+# Create a relationship
+curl -X POST "http://localhost:8000/relationships" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source": "customer_001",
+    "target": "order_001",
+    "type": "PLACED_ORDER",
+    "properties": {"date": "2024-01-15"}
+  }'
+
+# Query the knowledge graph
+curl -X POST "http://localhost:8000/query" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "MATCH (n) RETURN n"
+  }'
+
+# Get statistics
+curl "http://localhost:8000/stats"
+```
+
+#### **5. Event Bus Operations**
+
+```bash
+# Start RabbitMQ (if using distributed mode)
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+
+# Run agents with event bus integration
+uv run python -m multi_agent_system run-agent knowledge_manager
+uv run python -m multi_agent_system run-agent data_architect
+uv run python -m multi_agent_system run-agent data_engineer
+```
+
 ## 🏗️ **Architecture Overview**
 
 ```
@@ -111,14 +163,25 @@ uv run python -m multi_agent_system read-file data/models/customer.json
 │ • Workflows     │    │ • Business      │    │ • Communication │
 │ • Agents        │    │   Logic         │    │ • Storage       │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │  Event Bus      │
+                    │  (RabbitMQ)     │
+                    └─────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │  REST API       │
+                    │  (FastAPI)      │
+                    └─────────────────┘
 ```
 
 ## 📚 **Core Components**
 
 ### **Domain Layer**
 - **Commands**: `ModelingCommand`, `FileCommand`, `ShellCommand`
-- **Models**: `DDADocument`, `DataEntity`, `Relationship`
+- **Models**: `DDADocument`, `DataEntity`, `Relationship`, `KnowledgeEvent`
 - **Services**: Domain business logic and validation
+- **Events**: Event-driven architecture for KG operations
 
 ### **Application Layer**
 - **Command Handlers**: Process and execute commands
@@ -130,6 +193,30 @@ uv run python -m multi_agent_system read-file data/models/customer.json
 - **Parsers**: DDA document parsing and processing
 - **Communication**: Agent-to-agent messaging
 - **Storage**: File and data persistence
+- **Event Bus**: RabbitMQ-based distributed messaging
+- **API Gateway**: FastAPI-based REST endpoints
+
+## 🚀 **Advanced Features**
+
+### **Event-Driven Architecture**
+- **Distributed Event Bus**: RabbitMQ-based messaging for scalable operations
+- **Knowledge Events**: Structured events for KG operations with validation
+- **Agent Communication**: Seamless agent-to-agent messaging via events
+- **Fallback Support**: Local handlers when distributed mode unavailable
+
+### **REST API for Knowledge Graph Operations**
+- **Entity Management**: Full CRUD operations for knowledge graph entities
+- **Relationship Management**: Create and manage entity relationships
+- **Batch Operations**: Process multiple operations efficiently
+- **Query Interface**: Execute custom queries against the knowledge graph
+- **Event Publishing**: Publish custom events via API
+- **Health Monitoring**: Comprehensive health checks and statistics
+
+### **Knowledge Management Agent**
+- **Conflict Resolution**: Automatic detection and resolution of KG conflicts
+- **Validation Engine**: Advanced validation rules for KG operations
+- **Reasoning Engine**: Symbolic reasoning for intelligent KG updates
+- **Escalation System**: Complex operations escalated to specialized agents
 
 ## 🔍 **Modeling Command Feature**
 
@@ -216,6 +303,11 @@ uv run pytest tests/interfaces/ -v
 
 # Run with coverage
 uv run pytest tests/ --cov=src --cov-report=html
+
+# Test specific components
+uv run pytest tests/test_kg_operations_api.py -v
+uv run pytest tests/test_rabbitmq_event_bus.py -v
+uv run pytest tests/test_knowledge_manager_agent.py -v
 ```
 
 ### **Test Categories**
@@ -302,6 +394,10 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 🎯 **Roadmap**
 
+- [x] **Phase 1**: Architecture & Design ✅
+- [x] **Phase 2**: Core Implementation (Event Bus & API) ✅
+- [ ] **Phase 3**: Advanced Features (Audit trails, monitoring, RBAC)
+- [ ] **Phase 4**: Testing & Documentation
 - [ ] **Phase 5**: Advanced agent collaboration features
 - [ ] **Phase 6**: Machine learning integration
 - [ ] **Phase 7**: Cloud deployment and scaling
