@@ -1,8 +1,9 @@
 # src/composition_root.py
 
-from typing import Dict, Callable, Tuple
+from typing import Dict, Callable, Tuple, Optional
 from application.agents.data_architect.agent import DataArchitectAgent
 from application.agents.data_engineer.agent import DataEngineerAgent
+from application.agents.knowledge_manager.agent import KnowledgeManagerAgent
 from application.agents.data_engineer.handlers.build_kg import BuildKGCommandHandler
 from application.agents.echo_agent import EchoAgent
 from application.commands.base import CommandBus
@@ -28,6 +29,8 @@ from domain.agent import Agent
 from domain.communication import CommunicationChannel
 from infrastructure.graphiti import get_graphiti
 from graphiti_core import Graphiti
+from infrastructure.in_memory_backend import InMemoryGraphBackend
+from application.event_bus import EventBus
 
 
 # --- Agent Factory Functions ---
@@ -52,6 +55,8 @@ def create_data_architect_agent(
     communication_channel: CommunicationChannel,
     graph: Graphiti,
     url: str,
+    kg_backend: Optional[InMemoryGraphBackend] = None,
+    event_bus: Optional[EventBus] = None,
 ) -> DataArchitectAgent:
     """Creates a DataArchitectAgent with a namespaced Graphiti graph and LLM."""
     return DataArchitectAgent(
@@ -61,6 +66,8 @@ def create_data_architect_agent(
         graph=graph,
         llm=graph,  # Use Graphiti for both graph and LLM
         url=url,
+        kg_backend=kg_backend,
+        event_bus=event_bus,
     )
 
 def create_data_engineer_agent(
@@ -69,6 +76,8 @@ def create_data_engineer_agent(
     communication_channel: CommunicationChannel,
     graph: Graphiti,
     url: str,
+    kg_backend: Optional[InMemoryGraphBackend] = None,
+    event_bus: Optional[EventBus] = None,
 ) -> DataEngineerAgent:
     """Creates a DataEngineerAgent with a namespaced Graphiti graph."""
     return DataEngineerAgent(
@@ -77,6 +86,32 @@ def create_data_engineer_agent(
         communication_channel=communication_channel,
         graph=graph,
         url=url,
+        kg_backend=kg_backend,
+        event_bus=event_bus,
+    )
+
+def create_knowledge_manager_agent(
+    agent_id: str,
+    command_bus: CommandBus,
+    communication_channel: CommunicationChannel,
+    kg_backend: Optional[InMemoryGraphBackend] = None,
+    event_bus: Optional[EventBus] = None,
+) -> KnowledgeManagerAgent:
+    """Creates a KnowledgeManagerAgent for complex knowledge graph operations."""
+    # Use in-memory backend if none provided
+    if kg_backend is None:
+        kg_backend = InMemoryGraphBackend()
+    
+    # Use in-memory event bus if none provided
+    if event_bus is None:
+        event_bus = EventBus()
+    
+    return KnowledgeManagerAgent(
+        agent_id=agent_id,
+        command_bus=command_bus,
+        communication_channel=communication_channel,
+        backend=kg_backend,
+        event_bus=event_bus,
     )
 
 def create_modeling_command_handler(graph: Graphiti) -> ModelingCommandHandler:
@@ -100,6 +135,7 @@ def create_modeling_command_handler(graph: Graphiti) -> ModelingCommandHandler:
 AGENT_REGISTRY: Dict[str, Callable[..., Agent]] = {
     "data_architect": create_data_architect_agent,
     "data_engineer": create_data_engineer_agent,
+    "knowledge_manager": create_knowledge_manager_agent,
     "echo": create_echo_agent,
 }
 
@@ -140,3 +176,11 @@ def bootstrap_command_bus() -> CommandBus:
     # because it depends on a runtime agent instance.
 
     return command_bus
+
+
+def bootstrap_knowledge_management() -> Tuple[InMemoryGraphBackend, EventBus]:
+    """Initialize knowledge management components."""
+    kg_backend = InMemoryGraphBackend()
+    event_bus = EventBus()
+    
+    return kg_backend, event_bus
