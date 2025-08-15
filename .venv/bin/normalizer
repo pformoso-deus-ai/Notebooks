@@ -1,4 +1,4 @@
-#!/home/hamlet/code/a2a_nsl/.venv/bin/python3
+#!/home/hamlet/code/a2a_nsl/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

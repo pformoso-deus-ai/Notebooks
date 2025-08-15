@@ -21,7 +21,7 @@
 
 @for %%i in ("/home/hamlet/code/a2a_nsl/.venv") do @set "VIRTUAL_ENV=%%~fi"
 
-@set "VIRTUAL_ENV_PROMPT="
+@set "VIRTUAL_ENV_PROMPT=multi-agent-system"
 @if NOT DEFINED VIRTUAL_ENV_PROMPT (
     @for %%d in ("%VIRTUAL_ENV%") do @set "VIRTUAL_ENV_PROMPT=%%~nxd"
 )

@@ -22,6 +22,14 @@ Requires-Dist: graphiti-core[openai]
 Requires-Dist: pytest-cov>=6.2.1
 Requires-Dist: pytest-asyncio>=1.1.0
 Requires-Dist: typer>=0.9.0
+Requires-Dist: pytest>=7.0.0
+Requires-Dist: pytest-asyncio>=0.23.0
+Requires-Dist: pytest-cov>=4.0.0
+Requires-Dist: pytest-mock>=3.12.0
+Requires-Dist: pytest-httpx>=0.28.0
+Requires-Dist: uv>=0.1.0
+Requires-Dist: ipykernel>=6.0.0
+Requires-Dist: jupyter>=1.0.0
 Provides-Extra: develop
 Requires-Dist: ruff>=0.1.0; extra == "develop"
 Requires-Dist: black>=23.0.0; extra == "develop"

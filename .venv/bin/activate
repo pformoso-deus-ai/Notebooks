@@ -84,8 +84,8 @@ _OLD_VIRTUAL_PATH="$PATH"
 PATH="$VIRTUAL_ENV/bin:$PATH"
 export PATH
 
-if [ "x" != x ] ; then
-    VIRTUAL_ENV_PROMPT=""
+if [ "xmulti-agent-system" != x ] ; then
+    VIRTUAL_ENV_PROMPT="multi-agent-system"
 else
     VIRTUAL_ENV_PROMPT=$(basename "$VIRTUAL_ENV")
 fi
